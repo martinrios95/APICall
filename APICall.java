@@ -126,12 +126,14 @@ public class APICall {
 
                 // Avoid memory leaking
                 input.close();
+                input = null;
             } else {
                 throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseMessage());
             }
 
             // Avoid memory leaking
             myConnection.disconnect();
+            myConnection = null;
         } catch (Exception error){
             throw new Exception(error.getMessage());
         }
@@ -195,12 +197,14 @@ public class APICall {
 
                 // Avoid memory leaking
                 input.close();
+                input = null;
             } else {
                 throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseMessage());
             }
 
             // Avoid memory leaking
             myConnection.disconnect();
+            myConnection = null;
         } catch (Exception error){
             throw new Exception(error.getMessage());
         }
@@ -265,12 +269,14 @@ public class APICall {
 
                 // Avoid memory leaking
                 input.close();
+                input = null;
             } else {
                 throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseMessage());
             }
 
             // Avoid memory leaking
             myConnection.disconnect();
+            myConnection = null;
         } catch (Exception error){
             throw new Exception(error.getMessage());
         }
