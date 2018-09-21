@@ -51,16 +51,16 @@ public class APICall {
     private String buffer;
 
     // Static variables from class
-    private static final String HTTP_HEADER = "http://";
-    private static final String HTTPS_HEADER = "https://";
+    private final String HTTP_HEADER = "http://";
+    private final String HTTPS_HEADER = "https://";
 
-    private static final String MALFORMED_URL_STRING = "Host is unreachable!";
-    private static final String EMPTY_URL_STRING = "Empty URL String!";
-    private static final String EMPTY_URL_METHOD = "Empty HTTP-parsing method!";
-    private static final String NON_EXISTENT_URL_METHOD = "HTTP-parsing method doesn't exist!";
-    private static final String BAD_RESPONSE_CODE = "Error while processing data: ";
+    private final String MALFORMED_URL_STRING = "Host is unreachable!";
+    private final String EMPTY_URL_STRING = "Empty URL String!";
+    private final String EMPTY_URL_METHOD = "Empty HTTP-parsing method!";
+    private final String NON_EXISTENT_URL_METHOD = "HTTP-parsing method doesn't exist!";
+    private final String BAD_RESPONSE_CODE = "Error while processing data: ";
 
-    private static final String[] HTTP_METHODS = {"get", "post", "put", "patch", "delete"};
+    private final String[] HTTP_METHODS = {"get", "post", "put", "patch", "delete"};
 
     /**
      * Send request to server and save it, using GET method.
@@ -123,9 +123,15 @@ public class APICall {
                 } finally {
                     buffer = out.toString();
                 }
+
+                // Avoid memory leaking
+                input.close();
             } else {
                 throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseMessage());
             }
+
+            // Avoid memory leaking
+            myConnection.disconnect();
         } catch (Exception error){
             throw new Exception(error.getMessage());
         }
@@ -186,9 +192,15 @@ public class APICall {
                 } finally {
                     buffer = out.toString();
                 }
+
+                // Avoid memory leaking
+                input.close();
             } else {
                 throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseMessage());
             }
+
+            // Avoid memory leaking
+            myConnection.disconnect();
         } catch (Exception error){
             throw new Exception(error.getMessage());
         }
@@ -250,9 +262,15 @@ public class APICall {
                 } finally {
                     buffer = out.toString();
                 }
+
+                // Avoid memory leaking
+                input.close();
             } else {
                 throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseMessage());
             }
+
+            // Avoid memory leaking
+            myConnection.disconnect();
         } catch (Exception error){
             throw new Exception(error.getMessage());
         }
@@ -273,10 +291,13 @@ public class APICall {
     private boolean exists(String method){
         boolean found = false;
         if (method.isEmpty()) return false;
-        for (String currentMethod: HTTP_METHODS){
-            found = currentMethod.equals(method.toLowerCase());
-            if (found) break;
+
+        int i = 0;
+        while (i < HTTP_METHODS.length && !found){
+            found = HTTP_METHODS[i].equals(method.toLowerCase());
+            if (!found) i++;
         }
+
         return found;
     }
 
