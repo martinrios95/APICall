@@ -44,13 +44,14 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * Class APICall - Overrides HTTP API method calling.
  * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 4.0
+ * @version 5.0
  */
 public class APICall {
 	// Instance variables
 	private String buffer;
+	private int responseCode;
 
-	// Static variables from class
+	// Static PRIVATE variables from class
 	private final String HTTP_HEADER = "http://";
 	private final String HTTPS_HEADER = "https://";
 
@@ -62,10 +63,58 @@ public class APICall {
 
 	private final String[] HTTP_METHODS = {"get", "post", "put", "patch", "delete"};
 
+	// Static PUBLIC variables for class, including HTTP response codes defined by RFC 7231
+	// See details on https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+
+	/**
+	 * 200 OK - See RFC 7231
+	 */
+	public static int OK = 200;
+
+	/**
+	 * 301 Moved Permanently - See RFC 7231
+	 */
+	public static int MOVED_PERMANENTLY = 301;
+
+	/**
+	 * 304 Not Modified - See RFC 7231
+	 */
+	public static int NOT_MODIFIED = 304;
+
+	/**
+	 * 400 Bad Request - See RFC 7231
+	 */
+	public static int BAD_REQUEST = 400;
+
+	/**
+	 * 403 Forbidden - See RFC 7231
+	 */
+	public static int FORBIDDEN = 403;
+
+	/**
+	 * 404 Not Found - See RFC 7231
+	 */
+	public static int NOT_FOUND = 404;
+
+	/**
+	 * 500 Internal Server Error - See RFC 7231
+	 */
+	public static int INTERNAL_SERVER_ERROR = 500;
+
+	/**
+	 * 502 Bad Gateway - See RFC 7231
+	 */
+	public static int BAD_GATEWAY = 502;
+
+	/**
+	 * 503 Service Unavailable - See RFC 7231
+	 */
+	public static int SERVICE_UNAVAILABLE = 503;
+
 	/**
 	 * Send request to server and save it, using GET method.
 	 * @param host API's URL.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not 200 (OK)
+	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
 	public void send(final String host) throws Exception {
 		try {
@@ -79,7 +128,7 @@ public class APICall {
 	 * Send request to server and save it, using any method.
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not 200 (OK)
+	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
 	public void send(final String host, final String method) throws Exception {
 		try {
@@ -107,10 +156,10 @@ public class APICall {
 				myConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			}
 
-			int responseCode = myConnection.getResponseCode();
+			responseCode = myConnection.getResponseCode();
 
 			// Valid responses: 200 OK, 301 Moved Permanently, 304 Not Modified
-			boolean success = (responseCode == 200) || (responseCode == 301) || (responseCode == 304);
+			boolean success = (responseCode == OK) || (responseCode == MOVED_PERMANENTLY) || (responseCode == NOT_MODIFIED);
 
 			// Set connection and response.
 			if (success){
@@ -150,7 +199,7 @@ public class APICall {
 	 * @see java.util.Map
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not 200 (OK)
+	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
 	public void send(final String host, final String method, final Map<String, String> headers) throws Exception {
 		try {
@@ -183,10 +232,10 @@ public class APICall {
 				myConnection.setRequestProperty(key, headers.get(key));
 			}
 
-			int responseCode = myConnection.getResponseCode();
+			responseCode = myConnection.getResponseCode();
 
 			// Valid responses: 200 OK, 301 Moved Permanently, 304 Not Modified
-			boolean success = (responseCode == 200) || (responseCode == 301) || (responseCode == 304);
+			boolean success = (responseCode == OK) || (responseCode == MOVED_PERMANENTLY) || (responseCode == NOT_MODIFIED);
 
 			// Set connection and response.
 			if (success){
@@ -227,7 +276,7 @@ public class APICall {
 	 * @see <a href="https://developer.android.com/reference/android/os/Bundle" target="_blank">Bundle</a>
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not 200 (OK)
+	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
 	public void send(final String host, final String method, final Bundle headers) throws Exception {
 		try {
@@ -260,10 +309,10 @@ public class APICall {
 				myConnection.setRequestProperty(key, headers.getString(key));
 			}
 
-			int responseCode = myConnection.getResponseCode();
+			responseCode = myConnection.getResponseCode();
 
 			// Valid responses: 200 OK, 301 Moved Permanently, 304 Not Modified
-			boolean success = (responseCode == 200) || (responseCode == 301) || (responseCode == 304);
+			boolean success = (responseCode == OK) || (responseCode == MOVED_PERMANENTLY) || (responseCode == NOT_MODIFIED);
 
 			// Set connection and response.
 			if (success){
@@ -320,6 +369,20 @@ public class APICall {
 		}
 
 		return found;
+	}
+
+	/**
+	 * Erase data from API calling.
+	 */
+	public void eraseBuffer(){
+		buffer = null;
+	}
+
+	/**
+	 * Get current response code from HTTP server on API calling.
+	 */
+	public int getResponseCode(){
+		return responseCode;
 	}
 
 	/**
