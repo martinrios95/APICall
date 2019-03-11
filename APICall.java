@@ -6,6 +6,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 /*
-	Copyright (C) 2018 Martin Rios
+	Copyright (C) 2019 Martin Rios
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are
@@ -151,9 +152,18 @@ public class APICall {
 
 			myConnection.setRequestMethod(method.toUpperCase());
 
-			// POST Header
+			// POST Header and encoded-data
 			if (method.toLowerCase().equals("post")){
 				myConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+				String[] hostSegments = host.split("\\?");
+				String url = hostSegments[0];
+				String uri = hostSegments[1];
+
+				OutputStream output = myConnection.getOutputStream();
+				output.write(uri.getBytes());
+				output.flush();
+				output.close();
 			}
 
 			responseCode = myConnection.getResponseCode();
@@ -222,9 +232,19 @@ public class APICall {
 
 			myConnection.setRequestMethod(method.toUpperCase());
 
-			// POST Header
+			// POST Header and encoded-data
 			if (method.toLowerCase().equals("post")){
 				myConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+				myConnection.setDoOutput(true);
+
+				String[] hostSegments = host.split("\\?");
+				String url = hostSegments[0];
+				String uri = hostSegments[1];
+
+				OutputStream output = myConnection.getOutputStream();
+				output.write(uri.getBytes());
+				output.flush();
+				output.close();
 			}
 
 			// Set HTTP Headers
@@ -299,9 +319,18 @@ public class APICall {
 
 			myConnection.setRequestMethod(method.toUpperCase());
 
-			// POST Header
+			// POST Header and encoded-data
 			if (method.toLowerCase().equals("post")){
 				myConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+				String[] hostSegments = host.split("\\?");
+				String url = hostSegments[0];
+				String uri = hostSegments[1];
+
+				OutputStream output = myConnection.getOutputStream();
+				output.write(uri.getBytes());
+				output.flush();
+				output.close();
 			}
 
 			// Set HTTP Headers
@@ -353,10 +382,6 @@ public class APICall {
 	public String receive(){
 		return buffer;
 	}
-
-	// Sources:
-	// http://sawchenko.net/blog/android/2014/02/28/Reading-an-httpurlconnection-response/
-	// https://gist.github.com/ssawchenko/9282300
 
 	private boolean exists(String method){
 		boolean found = false;
