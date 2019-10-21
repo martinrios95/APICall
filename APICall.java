@@ -1,7 +1,3 @@
-package network;
-
-import android.os.Bundle;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -62,7 +58,12 @@ public class APICall {
 	private final String NON_EXISTENT_URL_METHOD = "HTTP-parsing method doesn't exist!";
 	private final String BAD_RESPONSE_CODE = "Error while processing data: ";
 
-	private final String[] HTTP_METHODS = {"get", "post", "put", "patch", "delete"};
+	// Enum: HTTP Methods
+	private enum HTTPMethods {
+		get, post, put, patch, delete;
+	}
+
+	// private final String[] HTTP_METHODS = {"get", "post", "put", "patch", "delete"};
 
 	// Static PUBLIC variables for class, including HTTP response codes defined by RFC 7231
 	// See details on https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
@@ -115,13 +116,13 @@ public class APICall {
 	/**
 	 * Send request to server and save it, using GET method.
 	 * @param host API's URL.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
+	 * @throws APICallException If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
-	public void send(final String host) throws Exception {
+	public void send(final String host) throws APICallException {
 		try {
 			send(host, "get");
 		} catch (Exception error){
-			throw new Exception(error.getMessage());
+			throw new APICallException(error.getMessage());
 		}
 	}
 
@@ -129,14 +130,14 @@ public class APICall {
 	 * Send request to server and save it, using any method.
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
+	 * @throws APICallException If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
-	public void send(final String host, final String method) throws Exception {
+	public void send(final String host, final String method) throws APICallException {
 		try {
-			if (host.trim().isEmpty()) throw new Exception(EMPTY_URL_STRING);
-			if (method.trim().isEmpty()) throw new Exception(EMPTY_URL_METHOD);
+			if (host.trim().isEmpty()) throw new APICallException(EMPTY_URL_STRING);
+			if (method.trim().isEmpty()) throw new APICallException(EMPTY_URL_METHOD);
 
-			if (!exists(method)) throw new Exception(NON_EXISTENT_URL_METHOD);
+			if (!exists(method)) throw new APICallException(NON_EXISTENT_URL_METHOD);
 
 			// Set URL and HTTP-connection classes.
 			URL urlHost = new URL(host.trim());
@@ -148,7 +149,7 @@ public class APICall {
 				myConnection = (HttpURLConnection) urlHost.openConnection();
 			} else if (host.toLowerCase().contains(HTTPS_HEADER.toLowerCase())){
 				myConnection = (HttpsURLConnection) urlHost.openConnection();
-			} else throw new Exception(MALFORMED_URL_STRING);
+			} else throw new APICallException(MALFORMED_URL_STRING);
 
 			myConnection.setRequestMethod(method.toUpperCase());
 
@@ -183,7 +184,7 @@ public class APICall {
 						out.append(inputLine);
 					}
 				} catch (Exception error) {
-					throw new Exception(error.getMessage());
+					throw new APICallException(error.getMessage());
 				} finally {
 					buffer = out.toString();
 				}
@@ -192,14 +193,14 @@ public class APICall {
 				input.close();
 				input = null;
 			} else {
-				throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseCode() + " " + myConnection.getResponseMessage());
+				throw new APICallException(BAD_RESPONSE_CODE + myConnection.getResponseCode() + " " + myConnection.getResponseMessage());
 			}
 
 			// Avoid memory leaking
 			myConnection.disconnect();
 			myConnection = null;
 		} catch (Exception error){
-			throw new Exception(error.getMessage());
+			throw new APICallException(error.getMessage());
 		}
 	}
 
@@ -209,14 +210,14 @@ public class APICall {
 	 * @see java.util.Map
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
+	 * @throws APICallException If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
 	 */
-	public void send(final String host, final String method, final Map<String, String> headers) throws Exception {
+	public void send(final String host, final String method, final Map<String, String> headers) throws APICallException {
 		try {
-			if (host.trim().isEmpty()) throw new Exception(EMPTY_URL_STRING);
-			if (method.trim().isEmpty()) throw new Exception(EMPTY_URL_METHOD);
+			if (host.trim().isEmpty()) throw new APICallException(EMPTY_URL_STRING);
+			if (method.trim().isEmpty()) throw new APICallException(EMPTY_URL_METHOD);
 
-			if (!exists(method)) throw new Exception(NON_EXISTENT_URL_METHOD);
+			if (!exists(method)) throw new APICallException(NON_EXISTENT_URL_METHOD);
 
 			// Set URL and HTTP-connection classes.
 			URL urlHost = new URL(host.trim());
@@ -228,7 +229,7 @@ public class APICall {
 				myConnection = (HttpURLConnection) urlHost.openConnection();
 			} else if (host.toLowerCase().contains(HTTPS_HEADER.toLowerCase())){
 				myConnection = (HttpsURLConnection) urlHost.openConnection();
-			} else throw new Exception(MALFORMED_URL_STRING);
+			} else throw new APICallException(MALFORMED_URL_STRING);
 
 			myConnection.setRequestMethod(method.toUpperCase());
 
@@ -269,7 +270,7 @@ public class APICall {
 						out.append(inputLine);
 					}
 				} catch (Exception error) {
-					throw new Exception(error.getMessage());
+					throw new APICallException(error.getMessage());
 				} finally {
 					buffer = out.toString();
 				}
@@ -278,100 +279,14 @@ public class APICall {
 				input.close();
 				input = null;
 			} else {
-				throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseCode() + " " + myConnection.getResponseMessage());
+				throw new APICallException(BAD_RESPONSE_CODE + myConnection.getResponseCode() + " " + myConnection.getResponseMessage());
 			}
 
 			// Avoid memory leaking
 			myConnection.disconnect();
 			myConnection = null;
 		} catch (Exception error){
-			throw new Exception(error.getMessage());
-		}
-	}
-
-	/**
-	 * <i>Only for Android developers.</i>
-	 * Send request to server and save it, using methods and headers.
-	 * Headers are presented <i>as Bundle</i>. Bundle is <b>an Android OS' class</i> for using key/value pairs.</b>
-	 * @see <a href="https://developer.android.com/reference/android/os/Bundle" target="_blank">Bundle</a>
-	 * @param host API's URL.
-	 * @param method HTTP's method for API's calling.
-	 * @throws Exception If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
-	 */
-	public void send(final String host, final String method, final Bundle headers) throws Exception {
-		try {
-			if (host.trim().isEmpty()) throw new Exception(EMPTY_URL_STRING);
-			if (method.trim().isEmpty()) throw new Exception(EMPTY_URL_METHOD);
-
-			if (!exists(method)) throw new Exception(NON_EXISTENT_URL_METHOD);
-
-			// Set URL and HTTP-connection classes.
-			URL urlHost = new URL(host.trim());
-
-			HttpURLConnection myConnection;
-
-			// Create connection
-			if (host.toLowerCase().contains(HTTP_HEADER.toLowerCase())){
-				myConnection = (HttpURLConnection) urlHost.openConnection();
-			} else if (host.toLowerCase().contains(HTTPS_HEADER.toLowerCase())){
-				myConnection = (HttpsURLConnection) urlHost.openConnection();
-			} else throw new Exception(MALFORMED_URL_STRING);
-
-			myConnection.setRequestMethod(method.toUpperCase());
-
-			// POST Header and encoded-data
-			if (method.toLowerCase().equals("post")){
-				myConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-				String[] hostSegments = host.split("\\?");
-				String url = hostSegments[0];
-				String uri = hostSegments[1];
-
-				OutputStream output = myConnection.getOutputStream();
-				output.write(uri.getBytes());
-				output.flush();
-				output.close();
-			}
-
-			// Set HTTP Headers
-			for (String key: headers.keySet()){
-				myConnection.setRequestProperty(key, headers.getString(key));
-			}
-
-			responseCode = myConnection.getResponseCode();
-
-			// Valid responses: 200 OK, 301 Moved Permanently, 304 Not Modified
-			boolean success = (responseCode == OK) || (responseCode == MOVED_PERMANENTLY) || (responseCode == NOT_MODIFIED);
-
-			// Set connection and response.
-			if (success){
-				StringBuilder out = new StringBuilder();
-				InputStream input = new BufferedInputStream(myConnection.getInputStream());
-
-				try {
-					BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-					String inputLine = "";
-					while ((inputLine = reader.readLine()) != null) {
-						out.append(inputLine);
-					}
-				} catch (Exception error) {
-					throw new Exception(error.getMessage());
-				} finally {
-					buffer = out.toString();
-				}
-
-				// Avoid memory leaking
-				input.close();
-				input = null;
-			} else {
-				throw new Exception(BAD_RESPONSE_CODE + myConnection.getResponseCode() + " " + myConnection.getResponseMessage());
-			}
-
-			// Avoid memory leaking
-			myConnection.disconnect();
-			myConnection = null;
-		} catch (Exception error){
-			throw new Exception(error.getMessage());
+			throw new APICallException(error.getMessage());
 		}
 	}
 
@@ -388,8 +303,8 @@ public class APICall {
 		if (method.isEmpty()) return false;
 
 		int i = 0;
-		while (i < HTTP_METHODS.length && !found){
-			found = HTTP_METHODS[i].equals(method.toLowerCase());
+		while (i < HTTPMethods.values().length && !found){
+			found = method.toLowerCase().equals(HTTPMethods.values()[i].toString());
 			if (!found) i++;
 		}
 
