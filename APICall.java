@@ -1,3 +1,5 @@
+package com.ingraphica.qrlogin.api;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -10,7 +12,7 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 /*
-	Copyright (C) 2019 Martin Rios
+	Copyright (C) 2020 Martin Rios
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are
@@ -41,9 +43,10 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * Class APICall - Overrides HTTP API method calling.
  * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 5.0
+ * @license BSD-2-Clause
+ * @version 5.0-mod
  */
-public class APICall {
+public class APICall implements HTTPHandler {
 	// Instance variables
 	private String buffer;
 	private int responseCode;
@@ -113,10 +116,21 @@ public class APICall {
 	 */
 	public static int SERVICE_UNAVAILABLE = 503;
 
+	@Override
+	public String get(final String host){
+		try {
+			send(host, "get");
+			return receive();
+		} catch (Exception error){
+			throw new IllegalArgumentException(error.getMessage());
+		}
+	}
+
 	/**
 	 * Send request to server and save it, using GET method.
 	 * @param host API's URL.
 	 * @throws APICallException If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
+	 * @deprecated Since 5.0-mod, using each method instead.
 	 */
 	public void send(final String host) throws APICallException {
 		try {
@@ -131,6 +145,7 @@ public class APICall {
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
 	 * @throws APICallException If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
+	 * @deprecated Since 5.0-mod, using each method instead.
 	 */
 	public void send(final String host, final String method) throws APICallException {
 		try {
@@ -211,6 +226,7 @@ public class APICall {
 	 * @param host API's URL.
 	 * @param method HTTP's method for API's calling.
 	 * @throws APICallException If HTTP method doesn't exist, host/method are empty, URL is malformed or HTTP's response is not successful
+	 * @deprecated Since 5.0-mod, using each method instead.
 	 */
 	public void send(final String host, final String method, final Map<String, String> headers) throws APICallException {
 		try {
@@ -293,6 +309,7 @@ public class APICall {
 	/**
 	 * Get saved response from API-calling.
 	 * @return Server's response from API.
+	 * @deprecated Since 5.0-mod, due to security risks on saving response on variables.
 	 */
 	public String receive(){
 		return buffer;
@@ -320,6 +337,7 @@ public class APICall {
 
 	/**
 	 * Get current response code from HTTP server on API calling.
+	 * @deprecated Since 5.0-mod, using another class which can replace data saved on this place.
 	 */
 	public int getResponseCode(){
 		return responseCode;
@@ -328,6 +346,7 @@ public class APICall {
 	/**
 	 * Get current data from API.
 	 * @return A string containing data received from API called previously by send(), or null if there's no API called.
+	 * @see APICall
 	 */
 	@Override
 	public String toString(){
