@@ -1,6 +1,9 @@
 package network;
 
 public class HTTPCodes {
+    // Avoid instancing
+    private HTTPCodes() {}
+
     /**
      * 200 OK - See RFC 7231
      */

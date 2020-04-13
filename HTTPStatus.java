@@ -1,6 +1,9 @@
 package network;
 
 public class HTTPStatus {
+    // Avoid instancing
+    private HTTPStatus(){}
+
     /**
      * 200 OK - See RFC 7231
      */
