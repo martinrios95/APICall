@@ -1,5 +1,11 @@
 package network;
 
+/**
+ * Class HTTPCodes - RFC 7231 HTTP Statuses.
+ * @author Martin Rios - SysAdmin and Professional Computer Technician
+ * @deprecated Will be put into APICall class.
+ * @version 6.0-beta
+ */
 public class HTTPStatus {
     // Avoid instancing
     private HTTPStatus(){}
