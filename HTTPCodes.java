@@ -29,59 +29,47 @@ package network;
 	or implied, of Martin Rios.
 */
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Class HTTPCodes - RFC 7231 HTTP Codes.
+ * Enum HTTPCodes - RFC 7231 HTTP Codes.
  * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @deprecated Will be put into APICall class.
  * @version 6.0-beta
  */
 
-public class HTTPCodes {
-    // Avoid instancing
-    private HTTPCodes() {}
-
+public enum HTTPCodes {
     /**
-     * 200 OK - See RFC 7231
+     * HTTP Status Codes - See RFC 7231
      */
-    public static int OK = 200;
+    OK(200),
+    MOVED_PERMANENTLY(301),
+    NOT_MODIFIED(304),
+    BAD_REQUEST(400),
+    FORBIDDEN(403),
+    NOT_FOUND(404),
+    INTERNAL_SERVER_ERROR(500),
+    BAD_GATEWAY(502),
+    SERVICE_UNAVAILABLE(503);
 
-    /**
-     * 301 Moved Permanently - See RFC 7231
-     */
-    public static int MOVED_PERMANENTLY = 301;
+    private int code;
+    private static Map<Integer, HTTPCodes> map = new HashMap<>();
 
-    /**
-     * 304 Not Modified - See RFC 7231
-     */
-    public static int NOT_MODIFIED = 304;
+    HTTPCodes(int code){
+        this.code = code;
+    }
 
-    /**
-     * 400 Bad Request - See RFC 7231
-     */
-    public static int BAD_REQUEST = 400;
+    static {
+        for (HTTPCodes httpCode: map.values()){
+            map.put(httpCode.code, httpCode);
+        }
+    }
 
-    /**
-     * 403 Forbidden - See RFC 7231
-     */
-    public static int FORBIDDEN = 403;
+    public static HTTPCodes valueOf(int code){
+        return map.get(code);
+    }
 
-    /**
-     * 404 Not Found - See RFC 7231
-     */
-    public static int NOT_FOUND = 404;
-
-    /**
-     * 500 Internal Server Error - See RFC 7231
-     */
-    public static int INTERNAL_SERVER_ERROR = 500;
-
-    /**
-     * 502 Bad Gateway - See RFC 7231
-     */
-    public static int BAD_GATEWAY = 502;
-
-    /**
-     * 503 Service Unavailable - See RFC 7231
-     */
-    public static int SERVICE_UNAVAILABLE = 503;
+    public int getValue(){
+        return code;
+    }
 }

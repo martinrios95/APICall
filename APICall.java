@@ -150,7 +150,7 @@ public class APICall {
     }
 
     public boolean isOK(int code){
-        return (code == HTTPCodes.OK || code == HTTPCodes.NOT_MODIFIED || code == HTTPCodes.MOVED_PERMANENTLY);
+        return (code == HTTPCodes.OK.getValue() || code == HTTPCodes.NOT_MODIFIED.getValue() || code == HTTPCodes.MOVED_PERMANENTLY.getValue());
     }
 
     private HTTPResponse setResponse(HttpURLConnection http, Map<?, ?> headers) throws IOException{

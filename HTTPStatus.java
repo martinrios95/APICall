@@ -3,7 +3,6 @@ package network;
 /**
  * Class HTTPCodes - RFC 7231 HTTP Statuses.
  * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @deprecated Will be put into APICall class.
  * @version 6.0-beta
  */
 public class HTTPStatus {
@@ -38,12 +37,12 @@ public class HTTPStatus {
     /**
      * 404 Not Found - See RFC 7231
      */
-    public static String NOT_FOUND = "File not found";
+    public static String NOT_FOUND = "Not Found";
 
     /**
-     * 500 Stringernal Server Error - See RFC 7231
+     * 500 Internal Server Error - See RFC 7231
      */
-    public static String StringERNAL_SERVER_ERROR = "Internal Server Error";
+    public static String INTERNAL_SERVER_ERROR = "Internal Server Error";
 
     /**
      * 502 Bad Gateway - See RFC 7231
@@ -55,6 +54,6 @@ public class HTTPStatus {
      */
     public static String SERVICE_UNAVAILABLE = "Service Unavailable";
 
-    
+
 
 }

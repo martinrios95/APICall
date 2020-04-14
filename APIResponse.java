@@ -41,11 +41,11 @@ public class APIResponse implements HTTPResponse {
     protected String status;
 
     public APIResponse(){
-        this(HTTPCodes.OK, HTTPStatus.OK, "");
+        this(HTTPCodes.OK.getValue(), HTTPStatus.OK, "");
     }
 
     public APIResponse(String response){
-        this(HTTPCodes.OK, HTTPStatus.OK, response);
+        this(HTTPCodes.OK.getValue(), HTTPStatus.OK, response);
     }
 
     public APIResponse(APIResponse network){
