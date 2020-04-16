@@ -94,4 +94,9 @@ public class APIResponse implements HTTPResponse {
     public APIResponse clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("HTTP responses are not allowed to clone!");
     }
+
+    @Override
+    public boolean isOK(){
+        return (code == HTTPCodes.OK.getValue() || code == HTTPCodes.NOT_MODIFIED.getValue() || code == HTTPCodes.MOVED_PERMANENTLY.getValue());
+    }
 }

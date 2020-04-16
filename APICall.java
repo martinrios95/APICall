@@ -59,9 +59,7 @@ public class APICall {
 
     public HTTPResponse get(String url, Map<?, ?> headers) throws APICallException {
         try {
-            url = url.toLowerCase();
-
-            URL urlObject = new URL(url);
+            URL urlObject = new URL(url.trim());
 
             HttpURLConnection http = (HttpURLConnection) urlObject.openConnection();
 
@@ -91,9 +89,7 @@ public class APICall {
 
     public HTTPResponse post(String url, Map<?, ?> params, Map<?, ?> headers) throws APICallException {
         try {
-            url = url.toLowerCase();
-
-            URL urlObject = new URL(url);
+            URL urlObject = new URL(url.trim());
 
             HttpURLConnection http = (HttpURLConnection) urlObject.openConnection();
 
