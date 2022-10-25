@@ -1,9 +1,9 @@
-package network;
+package api;
 
 /**
  * Class HTTPCodes - RFC 7231 HTTP Statuses.
- * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 6.0-beta
+ * @author Martin Rios - Junior Developer
+ * @version 6.1
  */
 public class HTTPStatus {
     // Avoid instancing

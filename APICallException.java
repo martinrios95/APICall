@@ -1,4 +1,4 @@
-package network;
+package api;
 
 /*
 	Copyright (C) 2020 Martin Rios
@@ -31,11 +31,14 @@ package network;
 
 /**
  * Class APICallException
- * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 6.0-beta
+ * @author Martin Rios - Junior Developer
+ * @version 6.1
  */
 public class APICallException extends Exception {
     public APICallException(String message){
+        super(message);
+    }
+    public APICallException(Exception message){
         super(message);
     }
 }

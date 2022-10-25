@@ -1,9 +1,9 @@
-package network;
+package api;
 
 /**
  * Interface HTTPResponse - APICall's response wrapper.
- * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 6.0-beta
+ * @author Martin Rios - Junior Developer
+ * @version 6.1
  */
 public interface HTTPResponse {
     int getCode();

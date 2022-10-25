@@ -1,4 +1,4 @@
-package network;
+package api;
 
 /*
 	Copyright (C) 2020 Martin Rios
@@ -34,10 +34,9 @@ import java.util.Map;
 
 /**
  * Enum HTTPCodes - RFC 7231 HTTP Codes.
- * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 6.0-beta
+ * @author Martin Rios - Junior Developer
+ * @version 6.1
  */
-
 public enum HTTPCodes {
     /**
      * HTTP Status Codes - See RFC 7231
@@ -46,6 +45,7 @@ public enum HTTPCodes {
     MOVED_PERMANENTLY(301),
     NOT_MODIFIED(304),
     BAD_REQUEST(400),
+    UNAUTHORIZED(401),
     FORBIDDEN(403),
     NOT_FOUND(404),
     INTERNAL_SERVER_ERROR(500),

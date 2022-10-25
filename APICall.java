@@ -1,4 +1,4 @@
-package network;
+package api;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
-	Copyright (C) 2020 Martin Rios
+	Copyright (C) 2022 Martin Rios
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are
@@ -40,13 +40,17 @@ import java.util.Map;
 
 /**
  * Class APICall - Overrides HTTP API method calling.
- * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 6.0-beta
+ * @author Martin Rios - Junior Developer
+ * @version 6.1
  */
 
 public class APICall {
-    private enum HTTPMethods {
-        GET, POST, PUT, PATCH, DELETE;
+    protected HttpURLConnection getURLConnection(URL url) throws APICallException {
+        try {
+            return (HttpURLConnection) url.openConnection();
+        } catch (Exception error){
+            throw new APICallException(error.getMessage());
+        }
     }
 
     public HTTPResponse get(String url) throws APICallException {
@@ -61,7 +65,7 @@ public class APICall {
         try {
             URL urlObject = new URL(url.trim());
 
-            HttpURLConnection http = (HttpURLConnection) urlObject.openConnection();
+            HttpURLConnection http = getURLConnection(urlObject);
 
             http.setRequestMethod("" + HTTPMethods.GET);
 
@@ -91,7 +95,7 @@ public class APICall {
         try {
             URL urlObject = new URL(url.trim());
 
-            HttpURLConnection http = (HttpURLConnection) urlObject.openConnection();
+            HttpURLConnection http = getURLConnection(urlObject);
 
             http.setRequestMethod("" + HTTPMethods.POST);
 
@@ -146,10 +150,12 @@ public class APICall {
     }
 
     public boolean isOK(int code){
-        return (code == HTTPCodes.OK.getValue() || code == HTTPCodes.NOT_MODIFIED.getValue() || code == HTTPCodes.MOVED_PERMANENTLY.getValue());
+        return (code == HTTPCodes.OK.getValue()
+                || code == HTTPCodes.NOT_MODIFIED.getValue()
+                || code == HTTPCodes.MOVED_PERMANENTLY.getValue());
     }
 
-    private HTTPResponse setResponse(HttpURLConnection http, Map<?, ?> headers) throws IOException{
+    protected HTTPResponse setResponse(HttpURLConnection http, Map<?, ?> headers) throws IOException{
         try {
             for (Map.Entry<?, ?> entry: headers.entrySet()){
                 http.setRequestProperty(entry.getKey().toString().trim(), entry.getValue().toString().trim());
@@ -158,14 +164,15 @@ public class APICall {
             int code = http.getResponseCode();
             String status = http.getResponseMessage();
 
-            InputStreamReader input;
+            InputStream inputStream;
 
             if (isOK(code)){
-                input = new InputStreamReader(http.getInputStream());
+                inputStream = http.getInputStream();
             } else {
-                input = new InputStreamReader(http.getErrorStream());
+                inputStream = http.getErrorStream();
             }
 
+            InputStreamReader input = new InputStreamReader(inputStream);
             BufferedReader buffer = new BufferedReader(input);
 
             String inputLine = buffer.readLine();

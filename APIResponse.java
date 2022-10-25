@@ -1,4 +1,4 @@
-package network;
+package api;
 
 /*
 	Copyright (C) 2020 Martin Rios
@@ -31,10 +31,9 @@ package network;
 
 /**
  * Class APIResponse - Wrapper for APICall's response.
- * @author Martin Rios - SysAdmin and Professional Computer Technician
- * @version 6.0-beta
+ * @author Martin Rios - Junior Developer
+ * @version 6.1
  */
-
 public class APIResponse implements HTTPResponse {
     protected int code;
     protected String body;
