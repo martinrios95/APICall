@@ -1,14 +1,5 @@
 package api;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-
 /*
 	Copyright (C) 2022 Martin Rios
 	All rights reserved.
@@ -38,6 +29,14 @@ import java.util.Map;
 	or implied, of Martin Rios.
 */
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 /**
  * Class APICall - Overrides HTTP API method calling.
  * @author Martin Rios - Junior Developer
