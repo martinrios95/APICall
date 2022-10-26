@@ -31,7 +31,7 @@ package api;
 /**
  * Class HTTPCodes - RFC 7231 HTTP Statuses.
  * @author Martin Rios - Junior Developer
- * @version 6.2
+ * @version 6.2.1
  */
 public class HTTPStatus {
     // Avoid instancing

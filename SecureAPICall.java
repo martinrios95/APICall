@@ -34,7 +34,7 @@ import java.net.URL;
 /**
  * Class APICall - Overrides HTTPS API method calling.
  * @author Martin Rios - Junior Developer
- * @version 6.2
+ * @version 6.2.1
  */
 // TODO: Set Open-Closed Principle on APICall
 // TODO: Set Composition-Over-Inheritance

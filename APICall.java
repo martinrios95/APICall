@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * Class APICall - Overrides HTTP API method calling.
  * @author Martin Rios - Junior Developer
- * @version 6.2
+ * @version 6.2.1
  */
 
 public class APICall {
@@ -50,6 +50,14 @@ public class APICall {
         } catch (Exception error){
             throw new APICallException(error);
         }
+    }
+
+    private HttpURLConnection checkRedirection(HttpURLConnection http) throws IOException, APICallException {
+        if (isRedirection(http.getResponseCode())) {
+            String location = http.getHeaderField("Location");
+            http = getURLConnection(new URL(location));
+        }
+        return http;
     }
 
     public HTTPResponse get(String url) throws APICallException {
@@ -69,11 +77,7 @@ public class APICall {
             http.setInstanceFollowRedirects(true);
             http.setRequestMethod("" + HTTPMethods.GET);
 
-            if (isRedirection(http.getResponseCode())) {
-                String location = http.getHeaderField("Location");
-                urlObject = new URL(location);
-                http = getURLConnection(urlObject);
-            }
+            http = checkRedirection(http);
 
             return setResponse(http, headers);
         } catch (IOException error){
@@ -107,10 +111,14 @@ public class APICall {
             http.setInstanceFollowRedirects(true);
             http.setRequestMethod("" + HTTPMethods.POST);
 
-            OutputStream output = http.getOutputStream();
-            output.write(getURLParams(params).getBytes());
-            output.flush();
-            output.close();
+            http = checkRedirection(http);
+
+            if (!params.isEmpty()){
+                OutputStream output = http.getOutputStream();
+                output.write(getURLParams(params).getBytes());
+                output.flush();
+                output.close();
+            }
 
             return setResponse(http, headers);
         } catch (IOException error){

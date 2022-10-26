@@ -34,7 +34,7 @@ import java.net.HttpURLConnection;
 /**
  * Class APIResponse - Wrapper for APICall's response.
  * @author Martin Rios - Junior Developer
- * @version 6.2
+ * @version 6.2.1
  */
 public class APIResponse implements HTTPResponse {
     protected int code;
