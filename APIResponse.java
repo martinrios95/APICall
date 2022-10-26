@@ -29,10 +29,12 @@ package api;
 	or implied, of Martin Rios.
 */
 
+import java.net.HttpURLConnection;
+
 /**
  * Class APIResponse - Wrapper for APICall's response.
  * @author Martin Rios - Junior Developer
- * @version 6.1
+ * @version 6.2
  */
 public class APIResponse implements HTTPResponse {
     protected int code;
@@ -40,11 +42,11 @@ public class APIResponse implements HTTPResponse {
     protected String status;
 
     public APIResponse(){
-        this(HTTPCodes.OK.getValue(), HTTPStatus.OK, "");
+        this(HttpURLConnection.HTTP_OK, HTTPStatus.OK, "");
     }
 
     public APIResponse(String response){
-        this(HTTPCodes.OK.getValue(), HTTPStatus.OK, response);
+        this(HttpURLConnection.HTTP_OK, HTTPStatus.OK, response);
     }
 
     public APIResponse(APIResponse network){
@@ -96,6 +98,6 @@ public class APIResponse implements HTTPResponse {
 
     @Override
     public boolean isOK(){
-        return (code == HTTPCodes.OK.getValue() || code == HTTPCodes.NOT_MODIFIED.getValue() || code == HTTPCodes.MOVED_PERMANENTLY.getValue());
+        return (code == HttpURLConnection.HTTP_OK || code == HttpURLConnection.HTTP_NOT_MODIFIED);
     }
 }

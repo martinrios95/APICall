@@ -35,7 +35,8 @@ import java.util.Map;
 /**
  * Enum HTTPCodes - RFC 7231 HTTP Codes.
  * @author Martin Rios - Junior Developer
- * @version 6.1
+ * @version 6.2
+ * @deprecated Using enums from default class instead
  */
 public enum HTTPCodes {
     /**

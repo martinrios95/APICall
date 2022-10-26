@@ -31,7 +31,7 @@ package api;
 /**
  * Interface HTTPResponse - APICall's response wrapper.
  * @author Martin Rios - Junior Developer
- * @version 6.1
+ * @version 6.2
  */
 public interface HTTPResponse {
     int getCode();

@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * Class APICall - Overrides HTTP API method calling.
  * @author Martin Rios - Junior Developer
- * @version 6.1
+ * @version 6.2
  */
 
 public class APICall {
@@ -48,15 +48,15 @@ public class APICall {
         try {
             return (HttpURLConnection) url.openConnection();
         } catch (Exception error){
-            throw new APICallException(error.getMessage());
+            throw new APICallException(error);
         }
     }
 
     public HTTPResponse get(String url) throws APICallException {
         try {
-            return this.get(url, new HashMap<>());
+            return get(url, new HashMap<>());
         } catch (APICallException error){
-            throw new APICallException(error.getMessage());
+            throw new APICallException(error);
         }
     }
 
@@ -66,11 +66,18 @@ public class APICall {
 
             HttpURLConnection http = getURLConnection(urlObject);
 
+            http.setInstanceFollowRedirects(true);
             http.setRequestMethod("" + HTTPMethods.GET);
+
+            if (isRedirection(http.getResponseCode())) {
+                String location = http.getHeaderField("Location");
+                urlObject = new URL(location);
+                http = getURLConnection(urlObject);
+            }
 
             return setResponse(http, headers);
         } catch (IOException error){
-            throw new APICallException(error.getMessage());
+            throw new APICallException(error);
         }
     }
 
@@ -78,7 +85,7 @@ public class APICall {
         try {
             return post(url, new HashMap<>(), new HashMap<>());
         } catch (APICallException error){
-            throw new APICallException(error.getMessage());
+            throw new APICallException(error);
         }
     }
 
@@ -86,7 +93,7 @@ public class APICall {
         try {
             return post(url, params, new HashMap<>());
         } catch (APICallException error){
-            throw new APICallException(error.getMessage());
+            throw new APICallException(error);
         }
     }
 
@@ -96,9 +103,10 @@ public class APICall {
 
             HttpURLConnection http = getURLConnection(urlObject);
 
+            http.setDoOutput(true);
+            http.setInstanceFollowRedirects(true);
             http.setRequestMethod("" + HTTPMethods.POST);
 
-            http.setDoOutput(true);
             OutputStream output = http.getOutputStream();
             output.write(getURLParams(params).getBytes());
             output.flush();
@@ -106,8 +114,21 @@ public class APICall {
 
             return setResponse(http, headers);
         } catch (IOException error){
-            throw new APICallException(error.getMessage());
+            throw new APICallException(error);
         }
+    }
+
+    private static String getURIFromParams(Map<?, ?> params, String encoding) throws UnsupportedEncodingException {
+        StringBuilder uriParams = new StringBuilder();
+
+        for (Map.Entry<?, ?> entry: params.entrySet()){
+            String key = URLEncoder.encode(entry.getKey().toString(), encoding);
+            String value = URLEncoder.encode(entry.getValue().toString(), encoding);
+
+            uriParams.append(key).append("=").append(value).append("&");
+        }
+
+        return uriParams.toString();
     }
 
     public static String getURLParams(Map<?, ?> params){
@@ -115,43 +136,42 @@ public class APICall {
     }
 
     public static String getURLParams(Map<?, ?> params, String encoding) {
-        StringBuilder urlParams = new StringBuilder();
-
         try {
-            for (Map.Entry<?, ?> entry: params.entrySet()){
-                String key = URLEncoder.encode(entry.getKey().toString(), encoding);
-                String value = URLEncoder.encode(entry.getValue().toString(), encoding);
-
-                urlParams.append(key).append("=").append(value).append("&");
-            }
-
-            return urlParams.toString();
+            return getURIFromParams(params, encoding);
         } catch (UnsupportedEncodingException error) {
-            throw new IllegalArgumentException(error.getMessage());
+            throw new IllegalArgumentException(error);
         }
     }
 
     public static String getURLParams(Map<?, ?> params, Charset encoding) {
-        StringBuilder urlParams = new StringBuilder();
-
         try {
-            for (Map.Entry<?, ?> entry: params.entrySet()){
-                String key = URLEncoder.encode(entry.getKey().toString(), encoding.toString());
-                String value = URLEncoder.encode(entry.getValue().toString(), encoding.toString());
-
-                urlParams.append(key).append("=").append(value).append("&");
-            }
-
-            return urlParams.toString();
+            return getURIFromParams(params, encoding.toString());
         } catch (UnsupportedEncodingException error) {
-            throw new IllegalArgumentException(error.getMessage());
+            throw new IllegalArgumentException(error);
         }
     }
-
     public boolean isOK(int code){
-        return (code == HTTPCodes.OK.getValue()
-                || code == HTTPCodes.NOT_MODIFIED.getValue()
-                || code == HTTPCodes.MOVED_PERMANENTLY.getValue());
+        return (code == HttpURLConnection.HTTP_OK || code == HttpURLConnection.HTTP_NOT_MODIFIED);
+    }
+
+    public boolean isRedirection(int code){
+        return (code == HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM);
+    }
+
+    private InputStream getInputStream(HttpURLConnection http) throws IOException {
+        try {
+            InputStream inputStream;
+
+            if (isOK(http.getResponseCode())){
+                inputStream = http.getInputStream();
+            } else {
+                inputStream = http.getErrorStream();
+            }
+
+            return inputStream;
+        } catch (IOException error){
+            throw new IOException(error);
+        }
     }
 
     protected HTTPResponse setResponse(HttpURLConnection http, Map<?, ?> headers) throws IOException{
@@ -163,13 +183,7 @@ public class APICall {
             int code = http.getResponseCode();
             String status = http.getResponseMessage();
 
-            InputStream inputStream;
-
-            if (isOK(code)){
-                inputStream = http.getInputStream();
-            } else {
-                inputStream = http.getErrorStream();
-            }
+            InputStream inputStream = getInputStream(http);
 
             InputStreamReader input = new InputStreamReader(inputStream);
             BufferedReader buffer = new BufferedReader(input);
@@ -186,7 +200,7 @@ public class APICall {
 
             return new APIResponse(code, status, response.toString());
         } catch (IOException error){
-            throw new IOException(error.getMessage());
+            throw new IOException(error);
         }
     }
 }

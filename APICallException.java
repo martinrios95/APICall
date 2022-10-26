@@ -32,7 +32,7 @@ package api;
 /**
  * Class APICallException
  * @author Martin Rios - Junior Developer
- * @version 6.1
+ * @version 6.2
  */
 public class APICallException extends Exception {
     public APICallException(String message){

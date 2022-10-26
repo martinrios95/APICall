@@ -31,7 +31,7 @@ package api;
 /**
  * Class HTTPCodes - RFC 7231 HTTP Statuses.
  * @author Martin Rios - Junior Developer
- * @version 6.1
+ * @version 6.2
  */
 public class HTTPStatus {
     // Avoid instancing
@@ -81,7 +81,4 @@ public class HTTPStatus {
      * 503 Service Unavailable - See RFC 7231
      */
     public static String SERVICE_UNAVAILABLE = "Service Unavailable";
-
-
-
 }
