@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * Class APICall - Overrides HTTP API method calling.
  * @author Martin Rios - Junior Developer
- * @version 6.2.1
+ * @version 6.4
  */
 
 public class APICall {
@@ -73,13 +73,9 @@ public class APICall {
             URL urlObject = new URL(url.trim());
 
             HttpURLConnection http = getURLConnection(urlObject);
-
-            http.setInstanceFollowRedirects(true);
             http.setRequestMethod("" + HTTPMethods.GET);
 
-            http = checkRedirection(http);
-
-            return setResponse(http, headers);
+            return setResponse(http, HTTPMethods.GET, headers);
         } catch (IOException error){
             throw new APICallException(error);
         }
@@ -106,12 +102,7 @@ public class APICall {
             URL urlObject = new URL(url.trim());
 
             HttpURLConnection http = getURLConnection(urlObject);
-
-            http.setDoOutput(true);
-            http.setInstanceFollowRedirects(true);
             http.setRequestMethod("" + HTTPMethods.POST);
-
-            http = checkRedirection(http);
 
             if (!params.isEmpty()){
                 OutputStream output = http.getOutputStream();
@@ -120,7 +111,7 @@ public class APICall {
                 output.close();
             }
 
-            return setResponse(http, headers);
+            return setResponse(http, HTTPMethods.POST, headers);
         } catch (IOException error){
             throw new APICallException(error);
         }
@@ -182,11 +173,21 @@ public class APICall {
         }
     }
 
-    protected HTTPResponse setResponse(HttpURLConnection http, Map<?, ?> headers) throws IOException{
+    private HttpURLConnection checkFromOutput(HttpURLConnection http, HTTPMethods method){
+        boolean isPost = method == HTTPMethods.POST || method == HTTPMethods.PUT;
+        http.setDoOutput(isPost);
+        return http;
+    }
+
+    protected HTTPResponse setResponse(HttpURLConnection http, HTTPMethods method, Map<?, ?> headers) throws IOException{
         try {
             for (Map.Entry<?, ?> entry: headers.entrySet()){
                 http.setRequestProperty(entry.getKey().toString().trim(), entry.getValue().toString().trim());
             }
+
+            http = checkFromOutput(http, method);
+            http.setInstanceFollowRedirects(true);
+            http = checkRedirection(http);
 
             int code = http.getResponseCode();
             String status = http.getResponseMessage();
@@ -207,7 +208,8 @@ public class APICall {
             buffer.close();
 
             return new APIResponse(code, status, response.toString());
-        } catch (IOException error){
+        } catch (Exception error){
+            error.printStackTrace();
             throw new IOException(error);
         }
     }
