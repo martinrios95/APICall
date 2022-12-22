@@ -75,7 +75,7 @@ public class APICall {
             HttpURLConnection http = getURLConnection(urlObject);
             http.setRequestMethod("" + HTTPMethods.GET);
 
-            return setResponse(http, HTTPMethods.GET, headers);
+            return setGetResponse(http, headers);
         } catch (IOException error){
             throw new APICallException(error);
         }
@@ -104,14 +104,20 @@ public class APICall {
             HttpURLConnection http = getURLConnection(urlObject);
             http.setRequestMethod("" + HTTPMethods.POST);
 
-            if (!params.isEmpty()){
-                OutputStream output = http.getOutputStream();
-                output.write(getURLParams(params).getBytes());
-                output.flush();
-                output.close();
-            }
+            return setPostResponse(http, headers, params);
+        } catch (IOException error){
+            throw new APICallException(error);
+        }
+    }
 
-            return setResponse(http, HTTPMethods.POST, headers);
+    public HTTPResponse post(String url, byte[] rawData, Map<?, ?> headers) throws APICallException {
+        try {
+            URL urlObject = new URL(url.trim());
+
+            HttpURLConnection http = getURLConnection(urlObject);
+            http.setRequestMethod("" + HTTPMethods.POST);
+
+            return setPostResponse(http, headers, rawData);
         } catch (IOException error){
             throw new APICallException(error);
         }
@@ -161,7 +167,7 @@ public class APICall {
         try {
             InputStream inputStream;
 
-            if (isOK(http.getResponseCode())){
+            if (http.getResponseCode() >= 200 && http.getResponseCode() <= 300){
                 inputStream = http.getInputStream();
             } else {
                 inputStream = http.getErrorStream();
@@ -173,19 +179,100 @@ public class APICall {
         }
     }
 
-    private HttpURLConnection checkFromOutput(HttpURLConnection http, HTTPMethods method){
-        boolean isPost = method == HTTPMethods.POST || method == HTTPMethods.PUT;
-        http.setDoOutput(isPost);
-        return http;
-    }
-
-    protected HTTPResponse setResponse(HttpURLConnection http, HTTPMethods method, Map<?, ?> headers) throws IOException{
+    protected HTTPResponse setGetResponse(HttpURLConnection http, Map<?, ?> headers) throws IOException{
         try {
             for (Map.Entry<?, ?> entry: headers.entrySet()){
                 http.setRequestProperty(entry.getKey().toString().trim(), entry.getValue().toString().trim());
             }
 
-            http = checkFromOutput(http, method);
+            http.setInstanceFollowRedirects(true);
+            http = checkRedirection(http);
+
+            int code = http.getResponseCode();
+            String status = http.getResponseMessage();
+
+            InputStream inputStream = getInputStream(http);
+
+            InputStreamReader input = new InputStreamReader(inputStream);
+            BufferedReader buffer = new BufferedReader(input);
+
+            String inputLine = buffer.readLine();
+            StringBuilder response = new StringBuilder();
+
+            while (inputLine != null){
+                response.append(inputLine);
+                inputLine = buffer.readLine();
+            }
+
+            buffer.close();
+
+            return new APIResponse(code, status, response.toString());
+        } catch (Exception error){
+            error.printStackTrace();
+            throw new IOException(error);
+        }
+    }
+
+    private void writePostBytes(HttpURLConnection http, byte[] data) throws IOException {
+        OutputStream output = http.getOutputStream();
+        output.write(data);
+        output.flush();
+        output.close();
+    }
+
+    protected HTTPResponse setPostResponse(HttpURLConnection http, Map<?, ?> headers, byte[] rawData) throws IOException{
+        try {
+            for (Map.Entry<?, ?> entry: headers.entrySet()){
+                http.setRequestProperty(entry.getKey().toString().trim(), entry.getValue().toString().trim());
+            }
+
+            http.setDoOutput(true);
+
+            if (rawData.length != 0){
+                writePostBytes(http, rawData);
+            }
+
+            http.setInstanceFollowRedirects(true);
+            http = checkRedirection(http);
+
+            int code = http.getResponseCode();
+            String status = http.getResponseMessage();
+
+            InputStream inputStream = getInputStream(http);
+
+            InputStreamReader input = new InputStreamReader(inputStream);
+            BufferedReader buffer = new BufferedReader(input);
+
+            String inputLine = buffer.readLine();
+            StringBuilder response = new StringBuilder();
+
+            while (inputLine != null){
+                response.append(inputLine);
+                inputLine = buffer.readLine();
+            }
+
+            buffer.close();
+
+            return new APIResponse(code, status, response.toString());
+        } catch (Exception error){
+            error.printStackTrace();
+            throw new IOException(error);
+        }
+    }
+
+    protected HTTPResponse setPostResponse(HttpURLConnection http, Map<?, ?> headers, Map<?, ?> params) throws IOException{
+        try {
+            for (Map.Entry<?, ?> entry: headers.entrySet()){
+                http.setRequestProperty(entry.getKey().toString().trim(), entry.getValue().toString().trim());
+            }
+
+            http.setDoOutput(true);
+
+            if (!params.isEmpty()){
+                byte[] rawData = getURLParams(params).getBytes();
+                writePostBytes(http, rawData);
+            }
+
             http.setInstanceFollowRedirects(true);
             http = checkRedirection(http);
 
