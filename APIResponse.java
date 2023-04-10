@@ -1,7 +1,7 @@
 package api;
 
 /*
-	Copyright (C) 2020 Martin Rios
+	Copyright (C) 2023 Martin Rios
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are
@@ -29,31 +29,37 @@ package api;
 	or implied, of Martin Rios.
 */
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Class APIResponse - Wrapper for APICall's response.
- * @author Martin Rios - Junior Developer
- * @version 6.2.1
+ * @author Martin Rios - Technical Leader
+ * @version 7.0
  */
+// TODO: Refactor response to be a byte array instead of strings.
 public class APIResponse implements HTTPResponse {
     protected int code;
-    protected String body;
+    protected byte[] body;
     protected String status;
 
     public APIResponse(){
-        this(HttpURLConnection.HTTP_OK, HTTPStatus.OK, "");
+        this(HttpURLConnection.HTTP_OK, HTTPStatus.OK, new byte[0]);
     }
 
-    public APIResponse(String response){
-        this(HttpURLConnection.HTTP_OK, HTTPStatus.OK, response);
+    public APIResponse(byte[] body){
+        this(HttpURLConnection.HTTP_OK, HTTPStatus.OK, body);
     }
 
     public APIResponse(APIResponse network){
         this(network.getCode(), network.getStatus(), network.getBody());
     }
 
-    public APIResponse(int code, String status, String body){
+    public APIResponse(int code, String status, byte[] body){
         setCode(code);
         setStatus(status);
         setBody(body);
@@ -67,13 +73,8 @@ public class APIResponse implements HTTPResponse {
         this.status = status;
     }
 
-    public void setBody(String body){
+    public void setBody(byte[] body){
         this.body = body;
-    }
-
-    @Override
-    public String toString(){
-        return this.code + " " + this.status;
     }
 
     @Override
@@ -87,8 +88,25 @@ public class APIResponse implements HTTPResponse {
     }
 
     @Override
-    public String getBody(){
+    public byte[] getBody(){
         return body;
+    }
+
+    @Override
+    public String toString(){
+        return new String(body, Charset.defaultCharset());
+    }
+
+    public String toString(String strCharset){
+        return new String(body, Charset.forName(strCharset));
+    }
+
+    public String toString(Charset charset){
+        return new String(body, charset);
+    }
+
+    public Path download(String path) throws IOException {
+        return Files.write(Paths.get(path), body);
     }
 
     @Override

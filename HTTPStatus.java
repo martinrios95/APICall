@@ -30,7 +30,7 @@ package api;
 
 /**
  * Class HTTPCodes - RFC 7231 HTTP Statuses.
- * @author Martin Rios - Junior Developer
+ * @author Martin Rios - Technical Leader
  * @version 6.2.1
  */
 public class HTTPStatus {

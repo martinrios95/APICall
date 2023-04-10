@@ -1,7 +1,7 @@
 package api;
 
 /*
-	Copyright (C) 2022 Martin Rios
+	Copyright (C) 2023 Martin Rios
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are
@@ -39,11 +39,21 @@ import java.util.HashMap;
 import java.util.Map;
 /**
  * Class APICall - Overrides HTTP API method calling.
- * @author Martin Rios - Junior Developer
- * @version 6.4
+ * @author Martin Rios - Technical Leader
+ * @version 7.0
  */
 
 public class APICall {
+    private Charset charset;
+
+    public APICall(){
+        this(Charset.defaultCharset());
+    }
+
+    public APICall(Charset charset){
+        this.charset = charset;
+    }
+
     protected HttpURLConnection getURLConnection(URL url) throws APICallException {
         try {
             return (HttpURLConnection) url.openConnection();
@@ -139,7 +149,6 @@ public class APICall {
     public static String getURLParams(Map<?, ?> params){
         return getURLParams(params, StandardCharsets.UTF_8);
     }
-
     public static String getURLParams(Map<?, ?> params, String encoding) {
         try {
             return getURIFromParams(params, encoding);
@@ -193,20 +202,7 @@ public class APICall {
 
             InputStream inputStream = getInputStream(http);
 
-            InputStreamReader input = new InputStreamReader(inputStream);
-            BufferedReader buffer = new BufferedReader(input);
-
-            String inputLine = buffer.readLine();
-            StringBuilder response = new StringBuilder();
-
-            while (inputLine != null){
-                response.append(inputLine);
-                inputLine = buffer.readLine();
-            }
-
-            buffer.close();
-
-            return new APIResponse(code, status, response.toString());
+            return setOutput(code, status, inputStream);
         } catch (Exception error){
             error.printStackTrace();
             throw new IOException(error);
@@ -218,6 +214,23 @@ public class APICall {
         output.write(data);
         output.flush();
         output.close();
+    }
+
+    protected HTTPResponse setOutput(int code, String status, InputStream input) throws IOException {
+        // TODO: Avoid hardcoding buffer-size.
+        byte[] bytes = new byte[4096];
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        int bytesRead = -1;
+
+        while ((bytesRead = input.read(bytes)) != -1) {
+            output.write(bytes, 0, bytesRead);
+        }
+
+        byte[] outputBytes = output.toByteArray();
+
+        output.close();
+
+        return new APIResponse(code, status, outputBytes);
     }
 
     protected HTTPResponse setPostResponse(HttpURLConnection http, Map<?, ?> headers, byte[] rawData) throws IOException{
@@ -240,20 +253,7 @@ public class APICall {
 
             InputStream inputStream = getInputStream(http);
 
-            InputStreamReader input = new InputStreamReader(inputStream);
-            BufferedReader buffer = new BufferedReader(input);
-
-            String inputLine = buffer.readLine();
-            StringBuilder response = new StringBuilder();
-
-            while (inputLine != null){
-                response.append(inputLine);
-                inputLine = buffer.readLine();
-            }
-
-            buffer.close();
-
-            return new APIResponse(code, status, response.toString());
+            return setOutput(code, status, inputStream);
         } catch (Exception error){
             error.printStackTrace();
             throw new IOException(error);
@@ -281,20 +281,7 @@ public class APICall {
 
             InputStream inputStream = getInputStream(http);
 
-            InputStreamReader input = new InputStreamReader(inputStream);
-            BufferedReader buffer = new BufferedReader(input);
-
-            String inputLine = buffer.readLine();
-            StringBuilder response = new StringBuilder();
-
-            while (inputLine != null){
-                response.append(inputLine);
-                inputLine = buffer.readLine();
-            }
-
-            buffer.close();
-
-            return new APIResponse(code, status, response.toString());
+            return setOutput(code, status, inputStream);
         } catch (Exception error){
             error.printStackTrace();
             throw new IOException(error);

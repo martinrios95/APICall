@@ -1,6 +1,6 @@
 package api;
 /*
-	Copyright (C) 2022 Martin Rios
+	Copyright (C) 2023 Martin Rios
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are
@@ -30,12 +30,12 @@ package api;
 
 /**
  * Interface HTTPResponse - APICall's response wrapper.
- * @author Martin Rios - Junior Developer
- * @version 6.2.1
+ * @author Martin Rios - Technical Leader
+ * @version 7.0
  */
-public interface HTTPResponse {
+public interface HTTPResponse extends StringConverter {
     int getCode();
     String getStatus();
-    String getBody();
+    byte[] getBody();
     boolean isOK();
 }

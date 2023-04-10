@@ -30,7 +30,7 @@ package api;
 
 /**
  * Enum HTTPMethods - RFC 7231 HTTP Methods.
- * @author Martin Rios - Junior Developer
+ * @author Martin Rios - Technical Leader
  * @version 6.2.1
  */
 public enum HTTPMethods {

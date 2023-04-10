@@ -33,7 +33,7 @@ import java.net.URL;
 */
 /**
  * Class APICall - Overrides HTTPS API method calling.
- * @author Martin Rios - Junior Developer
+ * @author Martin Rios - Technical Leader
  * @version 6.2.1
  */
 // TODO: Set Open-Closed Principle on APICall
